@@ -1,2 +1,9 @@
 # NotesApp
-Una aplicación nativa de notas desarrollada con Kotlin y Jetpack Compose, siguiendo arquitectura MVVM con persistencia local en Room como parte de mi especialización en Android.
+
+Simple Android notes application built with:
+
+- Kotlin
+- Jetpack Compose
+- MVVM architecture
+
+This project is part of my Android learning path.
