@@ -19,10 +19,15 @@ class NotesViewModel : ViewModel() {
         )
     }
 
-    fun addNote() {
+    fun addNote(title: String, content: String) {
+
+        if (title.isBlank() && content.isBlank()) return
+
         val newId = _note.size + 1
         _note.add(
-            Note(newId, "Nota $newId", "Contenido de la nota $newId")
+            Note(id = newId,
+                title = title,
+                content = content)
         )
     }
 

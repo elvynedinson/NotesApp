@@ -9,7 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.evydev.notesapp.data.Note
@@ -20,10 +25,29 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
     val notes = viewModel.notes
 
+    var titleText by remember { mutableStateOf("") }
+    var contentText by remember { mutableStateOf("") }
+
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Mis Notas")
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = titleText,
+            onValueChange = { titleText = it },
+            label = {Text("Título")},
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = contentText,
+            onValueChange = {contentText = it},
+            label = {Text("Contenido")},
+            modifier = Modifier.fillMaxWidth()
+        )
 
         LazyColumn {
             items(notes) { note ->
@@ -34,7 +58,13 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { viewModel.addNote() }) {
+        Button(
+            onClick = {
+            viewModel.addNote(titleText,contentText)
+            titleText = ""
+            contentText = ""
+        }
+        ) {
             Text("Agregar Nota")
         }
     }
