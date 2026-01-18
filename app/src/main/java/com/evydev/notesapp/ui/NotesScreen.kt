@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +33,41 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
     var titleText by remember { mutableStateOf("") }
     var contentText by remember { mutableStateOf("") }
+    var noteToDelete by remember { mutableStateOf<Note?>(null) }
+
+    if (noteToDelete != null){
+        AlertDialog(
+            onDismissRequest = {
+                noteToDelete = null
+            },
+            title = {
+                Text("Eliminar Nota")
+            },
+            text = {
+                Text("¿Seguro que deseas eliminar esta nota?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteNote(noteToDelete!!)
+                        noteToDelete = null
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        noteToDelete = null
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
 
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
         Text("Mis Notas", style = MaterialTheme.typography.headlineMedium)
@@ -61,7 +97,7 @@ fun NotesScreen(viewModel: NotesViewModel) {
                 NoteItem(
                     note = note,
                     onclick = {
-                        viewModel.deleteNote(note)
+                        noteToDelete = note
                     }
                 )
                 Spacer(modifier = Modifier.height(18.dp))
