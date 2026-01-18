@@ -1,5 +1,7 @@
 package com.evydev.notesapp.ui
 
+import android.R.attr.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,17 +28,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.evydev.notesapp.data.Note
 import com.evydev.notesapp.viewmodel.NotesViewModel
+import androidx.compose.foundation.combinedClickable
 
 @Composable
 fun NotesScreen(viewModel: NotesViewModel) {
 
     val notes by viewModel.notes.collectAsStateWithLifecycle()
 
+    var noteEdit by remember { mutableStateOf<Note?>(null) }
     var titleText by remember { mutableStateOf("") }
     var contentText by remember { mutableStateOf("") }
     var noteToDelete by remember { mutableStateOf<Note?>(null) }
 
-    if (noteToDelete != null){
+    if (noteToDelete != null) {
         AlertDialog(
             onDismissRequest = {
                 noteToDelete = null
@@ -70,7 +74,70 @@ fun NotesScreen(viewModel: NotesViewModel) {
     }
 
 
-    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+    noteEdit?.let { note ->
+
+        var editTile by remember { mutableStateOf(note.title) }
+        var editcontent by remember { mutableStateOf(note.content) }
+
+        AlertDialog(
+            onDismissRequest = {
+                noteEdit = null
+            },
+            title = {
+                Text("Editar Nota")
+            },
+            text = {
+                Column {
+                    TextField(
+                        value = editTile,
+                        onValueChange = { editTile = it },
+                        label = { Text("Títutlo") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    TextField(
+                        value = editcontent,
+                        onValueChange = { editcontent = it },
+                        label = { Text("Contenido") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateNote(
+                            note.copy(
+                                title = editTile,
+                                content = editcontent
+                            )
+                        )
+                        noteEdit = null
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        noteEdit = null
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+
+    }
+
+
+    Column(modifier = Modifier
+        .padding(16.dp)
+        .fillMaxSize()) {
         Text("Mis Notas", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -78,7 +145,7 @@ fun NotesScreen(viewModel: NotesViewModel) {
         TextField(
             value = titleText,
             onValueChange = { titleText = it },
-            label = {Text("Título")},
+            label = { Text("Título") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -86,8 +153,8 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
         TextField(
             value = contentText,
-            onValueChange = {contentText = it},
-            label = {Text("Contenido")},
+            onValueChange = { contentText = it },
+            label = { Text("Contenido") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -98,6 +165,9 @@ fun NotesScreen(viewModel: NotesViewModel) {
                 NoteItem(
                     note = note,
                     onclick = {
+                        noteEdit = note
+                    },
+                    onLongClick = {
                         noteToDelete = note
                     }
                 )
@@ -109,10 +179,10 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
         Button(
             onClick = {
-            viewModel.addNote(titleText,contentText)
-            titleText = ""
-            contentText = ""
-        }, modifier = Modifier.fillMaxWidth()
+                viewModel.addNote(titleText, contentText)
+                titleText = ""
+                contentText = ""
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text("Agregar Nota")
         }
@@ -120,12 +190,16 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NoteItem(note: Note, onclick: () -> Unit) {
+fun NoteItem(note: Note, onclick: () -> Unit, onLongClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onclick() },
+            .combinedClickable(
+                onClick = { onclick() },
+                onLongClick = { onLongClick() }
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
