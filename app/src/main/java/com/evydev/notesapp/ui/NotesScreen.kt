@@ -2,12 +2,16 @@ package com.evydev.notesapp.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -28,8 +32,8 @@ fun NotesScreen(viewModel: NotesViewModel) {
     var titleText by remember { mutableStateOf("") }
     var contentText by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Mis Notas")
+    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+        Text("Mis Notas", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -49,6 +53,8 @@ fun NotesScreen(viewModel: NotesViewModel) {
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(18.dp))
+
         LazyColumn {
             items(notes) { note ->
                 NoteItem(note)
@@ -63,7 +69,7 @@ fun NotesScreen(viewModel: NotesViewModel) {
             viewModel.addNote(titleText,contentText)
             titleText = ""
             contentText = ""
-        }
+        }, modifier = Modifier.fillMaxWidth()
         ) {
             Text("Agregar Nota")
         }
@@ -73,8 +79,20 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
 @Composable
 fun NoteItem(note: Note) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(note.title)
-        Text(note.content)
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(note.title, style = MaterialTheme.typography.titleMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(note.content, style = MaterialTheme.typography.bodyMedium)
+
+        }
+
+
+
     }
 }
