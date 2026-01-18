@@ -2,37 +2,41 @@ package com.evydev.notesapp.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.evydev.notesapp.data.Note
+import com.evydev.notesapp.data.NoteRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class NotesViewModel : ViewModel() {
+class NotesViewModel(
+    private val repository: NoteRepository
+) : ViewModel() {
 
-    private val _note = mutableStateListOf<Note>()
-    val notes: List<Note> = _note
+    val notes = repository.notes.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
-    init {
-        _note.addAll(
-            listOf(
-                Note(1, "Primera nota", "Contenido de la primera nota"),
-                Note(2, "Segunda nota", "Contenido de la segunda nota"),
-                Note(3, "Tercera nota", "Contenido de la tercera nota")
-            )
-        )
-    }
-
-    fun addNote(title: String, content: String) {
+    fun addNote(title: String, content: String){
 
         if (title.isBlank() && content.isBlank()) return
 
-        val newId = _note.size + 1
-        _note.add(
-            Note(id = newId,
-                title = title,
-                content = content)
-        )
+        viewModelScope.launch {
+            repository.addNote(
+                Note(
+                    title = title,
+                    content = content
+                )
+            )
+        }
     }
 
     fun deleteNote(note: Note){
-        _note.remove(note)
+        viewModelScope.launch {
+            repository.deleteNote(note)
+        }
     }
-
 }

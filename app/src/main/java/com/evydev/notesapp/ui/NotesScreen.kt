@@ -23,13 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.evydev.notesapp.data.Note
 import com.evydev.notesapp.viewmodel.NotesViewModel
 
 @Composable
 fun NotesScreen(viewModel: NotesViewModel) {
 
-    val notes = viewModel.notes
+    val notes by viewModel.notes.collectAsStateWithLifecycle()
 
     var titleText by remember { mutableStateOf("") }
     var contentText by remember { mutableStateOf("") }
@@ -92,7 +93,7 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        LazyColumn {
+        LazyColumn(modifier = Modifier.weight(1f)) {
             items(notes) { note ->
                 NoteItem(
                     note = note,
@@ -100,7 +101,7 @@ fun NotesScreen(viewModel: NotesViewModel) {
                         noteToDelete = note
                     }
                 )
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 
@@ -124,7 +125,6 @@ fun NoteItem(note: Note, onclick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
             .clickable { onclick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
