@@ -31,4 +31,8 @@ class NotesViewModel : ViewModel() {
         )
     }
 
+    fun deleteNote(note: Note){
+        _note.remove(note)
+    }
+
 }

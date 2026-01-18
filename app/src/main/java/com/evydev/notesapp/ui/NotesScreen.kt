@@ -1,5 +1,6 @@
 package com.evydev.notesapp.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,7 +58,12 @@ fun NotesScreen(viewModel: NotesViewModel) {
 
         LazyColumn {
             items(notes) { note ->
-                NoteItem(note)
+                NoteItem(
+                    note = note,
+                    onclick = {
+                        viewModel.deleteNote(note)
+                    }
+                )
                 Spacer(modifier = Modifier.height(18.dp))
             }
         }
@@ -78,9 +84,12 @@ fun NotesScreen(viewModel: NotesViewModel) {
 }
 
 @Composable
-fun NoteItem(note: Note) {
+fun NoteItem(note: Note, onclick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { onclick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -89,10 +98,6 @@ fun NoteItem(note: Note) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(note.content, style = MaterialTheme.typography.bodyMedium)
-
         }
-
-
-
     }
 }
